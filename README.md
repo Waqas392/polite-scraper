@@ -46,9 +46,9 @@ python -m pytest -q
 
 The pipeline writes its results to:
 
-- `output/books.json` â€” validated book records.
-- `output/errors.json` â€” recorded extraction or fetching errors.
-- `output/run-report.json` â€” execution statistics and failures.
+- `output/books.json` - validated book records.
+- `output/errors.json` - recorded extraction or fetching errors.
+- `output/run-report.json` - execution statistics and failures.
 
 The `--fake` option adds a deliberately invalid URL to check whether a failed page is recorded without losing the valid book records.
 
@@ -116,3 +116,4 @@ This project is restricted to a website intended for scraping practice and colle
 The scraper covers only the first three catalogue pages and is not intended to represent the complete catalogue. Website layout changes may break the CSS selectors, and some source descriptions may contain malformed or duplicated text. The scraper preserves extracted source text rather than silently rewriting it.
 
 The run report describes one execution and can vary depending on cache contents, network conditions, and server responses.
+
