@@ -110,3 +110,36 @@ def test_repeated_server_errors_raise_fetch_error(client, monkeypatch):
 
     assert len(calls) == 2
     assert client.pages_fetched == 0
+def test_http_403_is_not_retried(client, monkeypatch):
+    calls = []
+
+    def fake_get(url, timeout):
+        calls.append(url)
+        return response(403, "Forbidden")
+
+    monkeypatch.setattr(client.session, "get", fake_get)
+
+    with pytest.raises(FetchError, match="HTTP 403"):
+        client.get("https://example.com/forbidden")
+
+    assert len(calls) == 1
+
+
+def test_connection_error_is_retried(client, monkeypatch):
+    results = iter([
+        requests.ConnectionError("connection failed"),
+        response(200, "recovered"),
+    ])
+    calls = []
+
+    def fake_get(url, timeout):
+        calls.append(url)
+        result = next(results)
+        if isinstance(result, Exception):
+            raise result
+        return result
+
+    monkeypatch.setattr(client.session, "get", fake_get)
+
+    assert client.get("https://example.com/connection") == "recovered"
+    assert len(calls) == 2
