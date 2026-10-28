@@ -50,3 +50,26 @@ def test_duplicate_urls_removed():
 def test_malformed_page_raises():
     with pytest.raises(ValueError):
         parse_detail("<html><body>oops</body></html>", "https://x/", "https://x/")
+
+import pytest
+
+from extract import normalize_price
+
+
+@pytest.mark.parametrize(
+    ("price_text", "expected"),
+    [
+        ("£51.77", 51.77),
+        ("£0.99", 0.99),
+        ("£1,234.56", 1234.56),
+        ("  £12.50  ", 12.50),
+    ],
+)
+def test_normalize_price(price_text, expected):
+    assert normalize_price(price_text) == expected
+
+
+@pytest.mark.parametrize("price_text", [None, "", "£", "unavailable"])
+def test_normalize_invalid_price(price_text):
+    with pytest.raises(ValueError, match="cannot parse price"):
+        normalize_price(price_text)
